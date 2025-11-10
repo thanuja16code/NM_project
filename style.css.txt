@@ -1,0 +1,26 @@
+// Replace YOUR_API_KEY with your Alpha Vantage key or use DEMO for sample data
+const API_KEY = "DEMO";
+const SYMBOL = "IBM";
+const URL = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${SYMBOL}&interval=1min&apikey=${API_KEY}`;
+
+async function fetchStock() {
+  try {
+    const res = await fetch(URL);
+    const data = await res.json();
+    const timeSeries = data["Time Series (1min)"];
+    if (!timeSeries) {
+      document.getElementById("price").innerText = "Data unavailable or demo limit reached.";
+      return;
+    }
+
+    const latestTime = Object.keys(timeSeries)[0];
+    const latestPrice = timeSeries[latestTime]["1. open"];
+    document.getElementById("price").innerText = `IBM Stock Price: $${parseFloat(latestPrice).toFixed(2)}`;
+    document.getElementById("time").innerText = `Last updated: ${latestTime}`;
+  } catch (err) {
+    document.getElementById("price").innerText = "Error fetching data.";
+  }
+}
+
+fetchStock();
+setInterval(fetchStock, 60000); // update every 1 minute
